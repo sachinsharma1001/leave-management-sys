@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "Leave Management Microservices",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "employeeToken",
+      "value": ""
+    },
+    {
+      "key": "managerToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Employee Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"employee1\",\n  \"password\": \"password\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Manager Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"manager1\",\n  \"password\": \"password\"\n}"
+        }
+      }
+    },
+    {
+      "name": "View Leave Balance",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{employeeToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/leaves/api/leaves/employees/1/balances"
+      }
+    },
+    {
+      "name": "Apply Leave",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{employeeToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leaves/api/leaves/applications",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employeeId\": 1,\n  \"leaveType\": \"CASUAL\",\n  \"startDate\": \"2026-07-01\",\n  \"endDate\": \"2026-07-02\",\n  \"numberOfDays\": 2,\n  \"reason\": \"Family function\",\n  \"reportingManagerId\": 100\n}"
+        }
+      }
+    },
+    {
+      "name": "Manager Pending Requests",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/leaves/api/leaves/manager/requests?status=PENDING"
+      }
+    },
+    {
+      "name": "Approve Leave",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leaves/api/leaves/manager/requests/1/decision",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"decision\": \"APPROVED\",\n  \"comments\": \"Approved\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Reject Leave",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leaves/api/leaves/manager/requests/1/decision",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"decision\": \"REJECTED\",\n  \"comments\": \"Not enough handover details\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Leave History",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{employeeToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/leaves/api/leaves/employees/1/history?page=0&size=10"
+      }
+    },
+    {
+      "name": "Notification History",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/notifications/api/notifications/1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        - id: leave-service
+          uri: lb://leave-service
+          predicates:
+            - Path=/leaves/**
+          filters:
+            - StripPrefix=1
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/notifications/**
+          filters:
+            - StripPrefix=1
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

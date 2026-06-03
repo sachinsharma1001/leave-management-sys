@@ -1,0 +1,67 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  discovery-service:
+    build:
+      context: .
+      dockerfile: discovery-service/Dockerfile
+    ports:
+      - "8761:8761"
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_URL: http://discovery-service:8761/eureka
+      JWT_SECRET: change-this-secret-key-change-this-secret-key
+    depends_on:
+      - discovery-service
+
+  leave-service:
+    build:
+      context: .
+      dockerfile: leave-service/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      EUREKA_URL: http://discovery-service:8761/eureka
+      JWT_SECRET: change-this-secret-key-change-this-secret-key
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - discovery-service
+      - rabbitmq
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      EUREKA_URL: http://discovery-service:8761/eureka
+      JWT_SECRET: change-this-secret-key-change-this-secret-key
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - discovery-service
+      - rabbitmq
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_URL: http://discovery-service:8761/eureka
+    depends_on:
+      - discovery-service
+      - auth-service
+      - leave-service
+      - notification-service

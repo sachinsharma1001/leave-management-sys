@@ -29,7 +29,15 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
 management:
+  tracing:
+    sampling:
+      probability: ${MANAGEMENT_TRACING_SAMPLING_PROBABILITY:1.0}
   endpoints:
     web:
       exposure:
         include: health,info,gateway
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.assignment: ${LOGGING_LEVEL_APP:INFO}
+    org.springframework.cloud.gateway: ${LOGGING_LEVEL_GATEWAY:INFO}

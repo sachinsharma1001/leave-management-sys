@@ -16,7 +16,14 @@ app:
     queue: leave.notifications
     routing-key: leave.notification
 management:
+  tracing:
+    sampling:
+      probability: ${MANAGEMENT_TRACING_SAMPLING_PROBABILITY:1.0}
   endpoints:
     web:
       exposure:
         include: health,info
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.assignment: ${LOGGING_LEVEL_APP:INFO}

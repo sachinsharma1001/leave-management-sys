@@ -14,6 +14,9 @@ This version uses Lombok to reduce boilerplate for DTOs, models, logging, builde
 | leave-service | 8082 | Employees, balances, leave requests, manager approval/rejection |
 | notification-service | 8083 | RabbitMQ notification consumer and notification history |
 | rabbitmq | 5672 / 15672 | Async notification broker |
+| elasticsearch | 9200 | Central log storage |
+| logstash | 12201/udp | Docker GELF log ingestion |
+| kibana | 5601 | Log search and dashboards |
 
 ## Tech Stack
 
@@ -25,6 +28,7 @@ This version uses Lombok to reduce boilerplate for DTOs, models, logging, builde
 - Spring Security
 - JJWT
 - RabbitMQ
+- ELK Stack for centralized JSON logging
 - Gradle multi-project build
 - Docker Compose
 - In-memory stores for MVP
@@ -63,6 +67,24 @@ RabbitMQ management console:
 http://localhost:15672
 username: guest
 password: guest
+```
+
+Kibana:
+
+```text
+http://localhost:5601
+```
+
+Logs are written as JSON by each Spring Boot service, forwarded to Logstash through Docker's GELF logging driver, and indexed in Elasticsearch as:
+
+```text
+leave-management-YYYY.MM.dd
+```
+
+Create a Kibana data view for:
+
+```text
+leave-management-*
 ```
 
 ## Run Without Docker
@@ -162,6 +184,10 @@ Authorization: Bearer <employee-token>
 | JWT_SECRET | change-this-secret-key-change-this-secret-key | auth-service, leave-service, notification-service |
 | EUREKA_URL | http://localhost:8761/eureka | gateway/services |
 | SPRING_RABBITMQ_HOST | localhost | leave-service, notification-service |
+| APP_ENV | local | all services |
+| LOGGING_LEVEL_ROOT | INFO | all services |
+| LOGGING_LEVEL_APP | INFO | all services |
+| MANAGEMENT_TRACING_SAMPLING_PROBABILITY | 1.0 | all services |
 
 ## Gradle Project Structure
 
@@ -186,6 +212,7 @@ The old Maven `pom.xml` files have been removed. Dependency management is handle
 - Notifications are published to RabbitMQ and logged by notification-service.
 - If RabbitMQ is unavailable, leave-service logs the notification failure without crashing the request.
 - Global exception handlers return structured error responses.
+- Application logs include Micrometer tracing MDC fields such as `traceId` and `spanId` when a request is being handled.
 
 ## Documents Included
 

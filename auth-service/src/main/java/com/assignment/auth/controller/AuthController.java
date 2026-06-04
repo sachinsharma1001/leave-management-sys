@@ -24,7 +24,6 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/login")
-
     public LoginResponse login(@RequestBody LoginRequest request) {
         AppUser user = users.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password"));

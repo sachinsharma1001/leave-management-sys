@@ -12,7 +12,14 @@ security:
     secret: ${JWT_SECRET:secret-key}
     expiration-minutes: 120
 management:
+  tracing:
+    sampling:
+      probability: ${MANAGEMENT_TRACING_SAMPLING_PROBABILITY:1.0}
   endpoints:
     web:
       exposure:
         include: health,info
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.assignment: ${LOGGING_LEVEL_APP:INFO}

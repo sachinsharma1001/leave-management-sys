@@ -180,3 +180,98 @@ Response:
   }
 ]
 ```
+
+## 9. Summarize Text as Markdown
+
+```http
+POST /leaves/api/summaries
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+Environment required by `leave-service`:
+
+```text
+OPENAI_API_KEY=<your-api-key>
+OPENAI_MODEL=gpt-4.1-mini
+```
+
+Request:
+
+```json
+{
+  "text": "Long text to summarize...",
+  "focus": "Optional area to emphasize"
+}
+```
+
+Response `200 OK`:
+
+```json
+{
+  "summaryMarkdown": "## Summary\n\n- ...\n\n## Key Takeaways\n\n- ...",
+  "model": "gpt-4.1-mini"
+}
+```
+
+Errors:
+
+- `400 Bad Request` when `text` is empty.
+- `503 Service Unavailable` when `OPENAI_API_KEY` is not configured.
+- `502 Bad Gateway` when the upstream OpenAI request fails.
+
+## 10. AI Leave Request Review
+
+Read-only manager assistant that reviews a leave request and recommends the next action. This API does not approve or reject the leave; the manager still uses the existing decision endpoint.
+
+```http
+POST /leaves/api/ai/leave-requests/{requestId}/review
+Authorization: Bearer <manager-token>
+Content-Type: application/json
+```
+
+Environment required by `leave-service`:
+
+```text
+OPENAI_API_KEY=<your-api-key>
+OPENAI_MODEL=gpt-4.1-mini
+```
+
+Request:
+
+```json
+{
+  "additionalContext": "Critical release week. Prefer approval only if there is no team coverage risk."
+}
+```
+
+Response `200 OK`:
+
+```json
+{
+  "recommendation": "APPROVE",
+  "confidence": "HIGH",
+  "reasoningMarkdown": "## Review\n\n- Employee has sufficient leave balance.\n- No overlapping team leaves were found.\n\n## Recommendation\n\nApprove the request.",
+  "suggestedManagerComment": "Approved. Please complete handover before leave.",
+  "model": "gpt-4.1-mini"
+}
+```
+
+Possible `recommendation` values:
+
+- `APPROVE`
+- `REJECT`
+- `NEEDS_MORE_INFO`
+
+Possible `confidence` values:
+
+- `LOW`
+- `MEDIUM`
+- `HIGH`
+
+Errors:
+
+- `403 Forbidden` when the caller is not a manager or the request does not belong to the manager's team.
+- `404 Not Found` when the leave request does not exist.
+- `503 Service Unavailable` when `OPENAI_API_KEY` is not configured.
+- `502 Bad Gateway` when the upstream OpenAI request fails or does not return valid review JSON.

@@ -72,6 +72,7 @@ services:
       dockerfile: leave-service/Dockerfile
     ports:
       - "8082:8082"
+      - "5005:5005"
     environment:
       APP_ENV: local
       SPRING_PROFILES_ACTIVE: docker
@@ -80,6 +81,7 @@ services:
       EUREKA_URL: http://discovery-service:8761/eureka
       JWT_SECRET: change-this-secret-key-change-this-secret-key
       SPRING_RABBITMQ_HOST: rabbitmq
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     depends_on:
       - discovery-service
       - rabbitmq

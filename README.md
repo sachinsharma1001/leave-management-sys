@@ -49,6 +49,12 @@ docker compose up --build
 
 Docker builds each Spring Boot service using Gradle inside the container. No Maven command is required.
 
+After making code changes in only `leave-service`, rebuild and restart just that service without restarting its dependencies:
+
+```bash
+docker compose up -d --no-deps --build leave-service
+```
+
 Gateway URL:
 
 ```text
